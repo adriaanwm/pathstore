@@ -1,0 +1,24 @@
+{
+  "name": "pathstore",
+  "version": "0.0.1",
+  "description": "State container (store) that works great with preact, react, and redux devtools.",
+  "source": "src/index.js",
+  "module": "dist/pathstore.es.js",
+  "main": "dist/pathstore.js",
+  "umd:main": "dist/pathstore.umd.js",
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "test": "jest"
+  },
+  "author": "Adriaan Mulder",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3",
+    "microbundle": "^0.13.0"
+  },
+  "dependencies": {
+    "ramda": "^0.27.1"
+  }
+}

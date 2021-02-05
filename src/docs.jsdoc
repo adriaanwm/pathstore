@@ -1,0 +1,20 @@
+
+Hook that returns a stateful value, and a function to update it.
+@memberof store
+@method use
+@param {Array} path  The path to use.
+@param initialValue  The initial value.
+@param options  Some additional options.
+@param [boolean=false] options.cleanup  Set the value at path in state to undefined when the component unmounts
+@param [boolean=false] options.override  Set the value at path to initialValue even if there is already a value there
+@return {Array.<{value: *, setValue: Function}>}
+@return value  The value at path in state
+@return {Function} setValue  A function to update value in state
+@example
+onst ReactCounter = () => {
+ const [count, setCount] = store.use(['path', 'to', 'counter'], 0)
+ return <div>
+   <button onClick={() => setCount(count + 1)} >Increment</button>
+   <span>count: {count}</span>
+ </div>
+}
