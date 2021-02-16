@@ -84,6 +84,8 @@ use the store
 
 ```js
 
+// This will be a lot more satisfying if you have Redux Devtools running in your browser...
+
 const TextInput = ({formName, name, defaultValue = '', ...props}) => {
   const [value, setValue] = store.use([formName, 'values', name], defaultValue)
   return <input
@@ -94,6 +96,11 @@ const TextInput = ({formName, name, defaultValue = '', ...props}) => {
   />
 }
 
+const FieldError = ({formName, name, ...props}) => {
+  const [value] = store.use([formName, 'errors', name])
+  return value ? <span {...props}>{value}</span> : null
+}
+
 const ExampleForm = () => {
   const name = 'ExampleForm'
   const onSubmit = ev => {
@@ -101,10 +108,15 @@ const ExampleForm = () => {
     const values = store.get([name, 'values'])
     // from here you can run some validations, submit the values, etc.
     // ...
+    // As an example, lets say there's an email field error:
+    store.set([name, 'errors', 'email'], 'A fake email error')
+    return
   }
   return <form onSubmit={onSubmit}>
     <TextInput formName={name} name='email' type='email' />
+    <FieldError formName={name} name='email' />
     <TextInput formName={name} name='password' type='password' />
+    <FieldError formName={name} name='password' />
     <button>Submit</button>
   </form>
 }
