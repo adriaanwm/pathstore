@@ -134,6 +134,9 @@ const initStore = (store) => {
     theme: localStorage.getItem('theme')
   })
 }
+
+const store = createStore(...)
+initStore(store)
 ```
 
 ### Many updates at once
@@ -177,7 +180,7 @@ Creates a new store.
 -   `init` **Object** The initialization object.
     -   `useState` **Function** The useState function from react or preact.
     -   `useEffect` **Function** The useEffect function from react or preact.
-    -   `reduxDevTools` **Boolean** Whether to turn on redux devtools.
+    -   `reduxDevtools` **Boolean** Whether to turn on redux devtools.
 
 #### Returns
 
@@ -187,7 +190,7 @@ Creates a new store.
 
 ```javascript
 import { useState, useEffect } from 'react'
-let store = createStore({useState, useEffect, reduxDevTools: true})
+let store = createStore({useState, useEffect, reduxDevtools: true})
 store.subscribe([], state => console.log(state) );
 store.set(['a'], 'b')   // logs { a: 'b' }
 store.set(['c'], 'd')   // logs { a: 'b', c: 'd' }
