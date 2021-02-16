@@ -67,7 +67,7 @@ create a store
 import {createStore} from '@adriaanwm/pathstore'
 import {useEffect, useState} from 'react'
 
-export const store = createStore({ useEffect, useState, withReduxDevtools: true })
+export const store = createStore({ useEffect, useState, reduxDevtools: true })
 ```
 
 use the store
