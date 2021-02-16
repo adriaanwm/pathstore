@@ -64,7 +64,7 @@ npm install --save @adriaanwm/pathstore
 create a store
 
 ```js
-import {createStore} from 'pathstore'
+import {createStore} from '@adriaanwm/pathstore'
 import {useEffect, useState} from 'react'
 
 export const store = createStore({ useEffect, useState, withReduxDevtools: true })
