@@ -1,5 +1,5 @@
 {
-  "name": "pathstore",
+  "name": "@adriaanwm/pathstore",
   "version": "0.0.1",
   "description": "State container (store) that works great with preact, react, and redux devtools.",
   "source": "src/index.js",

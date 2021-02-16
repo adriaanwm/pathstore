@@ -9,6 +9,7 @@ A simple, performant global store that works well with React.
 -   [From React local state to Pathstore](#from-react-local-state-to-pathstore)
 -   [Getting Started](#getting-started)
 -   [Examples](#examples)
+-   [Performance](#performance)
 -   [API](#api)
 -   [License](#license)
 
@@ -17,7 +18,7 @@ A simple, performant global store that works well with React.
 Suppose we have a simple counter component that uses local react state:
 
 ```js
-const ReactCounter = () => {
+const Counter = () => {
   const [count, setCount] = useState(0)
   return <div>
     <button onClick={() => setCount(count + 1)} >Increment</button>
@@ -26,34 +27,30 @@ const ReactCounter = () => {
 }
 ```
 
-To use Pathstore instead of local state, simply replace this line:
+To use Pathstore instead of local state, replace `useState(0)` with `store.use(['counter'], 0)`. Your component should look like this.
 
 ```js
-const [count, setCount] = useState(0)
+const Counter = () => {
+  const [count, setCount] = store.use(['counter'], 0)
+  return <div>
+    <button onClick={() => setCount(count + 1)} >Increment</button>
+    <span>count: {count}</span>
+  </div>
+}
 ```
 
-with this:
+Now the counter value is stored in the global state `{..., counter: <value>, ...}` and its value can easily be used in other components.
+
+You might wonder, why did we pass in `['counter']` instead of just `'counter'`. This is because Pathstore lets you use nested values just as easily as any other values. For example, if instead of `['counter']` we pass in `['counter', 'nestedExample']`, then the value of the counter in the store would look something like this:
 
 ```js
-const [count, setCount] = store.use(['counter'], 0)
-```
-
-The counter value will now be stored in the global store under the key `counter`
-
-```js
-{ counter: 0 }
-```
-
-Suppose we want the counter value nested somewhere in our global state,
-
-```js
-{ counters: { exampleCounter: 0 } }
-```
-
-We would update the array we passed to `store.use`, like this:
-
-```js
-const [count, setCount] = store.use(['counters', 'exampleCounter'], 0)
+{
+  counter: {
+    nestedExample: <value>,
+    ...
+  },
+  ...
+}
 ```
 
 ## Getting started
@@ -61,7 +58,7 @@ const [count, setCount] = store.use(['counters', 'exampleCounter'], 0)
 install
 
 ```bash
-npm install --save pathstore
+npm install --save @adriaanwm/pathstore
 ```
 
 create a store
@@ -77,11 +74,78 @@ use the store
 
 ## Examples
 
-TODO
+#### Table of Contents
+
+-   [Form Input](#form-input)
+-   [Initialization](#initialization)
+-   [Many updates at once](#many-updates-at-once)
+
+### Form Input
+
+```js
+
+const TextInput = ({formName, name, defaultValue = '', ...props}) => {
+  const [value, setValue] = store.use([formName, 'values', name], defaultValue)
+  return <input
+    onChange={ev => setValue(ev.target.value)}
+    name={name}
+    value={value}
+    {...props}
+  />
+}
+
+const ExampleForm = () => {
+  const name = 'ExampleForm'
+  const onSubmit = ev => {
+    ev.preventDefault()
+    const values = store.get([name, 'values'])
+    // from here you can run some validations, submit the values, etc.
+    // ...
+  }
+  return <form onSubmit={onSubmit}>
+    <TextInput formName={name} name='email' type='email' />
+    <TextInput formName={name} name='password' type='password' />
+    <button>Submit</button>
+  </form>
+}
+
+```
+
+### Initialization
+
+Often you need to set some initial state before your app even starts, and maybe again when the user logs out.
+
+```js
+const initStore = (store) => {
+  store.set([], {
+    token: localStorage.getItem('token'),
+    theme: localStorage.getItem('theme')
+  })
+}
+```
+
+### Many updates at once
+
+Sometimes you want to change state in more than once place but you only want your components to rerender after all the changes are made. There's a `noPublish` option for that.
+
+```js
+const onSubmit = (ev) => {
+  // ...
+  store.set(['modalState'], undefined, {noPublish: true})
+  store.set(['modal'], undefined)
+  // subscriptions will only be called after the second store.set is called
+}
+```
+
+## Performance
+
+Improving performance of global stores was one of the main reasons Pathstore was built. Global stores often call every subscriber for every state change. It's basically asking every stateful component "Do you care about this change?" for every single state change. This becomes a problem if you're storing things that can change many times in a short period of time (like mouse position). This doesn't seem optimal. With Pathstore, subscribers can subscribe to a specific location in the store, which could cut down significantly on the number of times it's called.
+
+I haven't gotten the chance to benchmark Pathstore vs alternatives like Redux and Unistore. Not even sure the best way to do this. If anyone has ideas, please let me know by creating an issue.
+
+Pathstore is also quite small, for those concerned with initial load times.
 
 ## API
-
-<!-- Generated by documentation.js. Update this documentation by updating the source code. -->
 
 #### Table of Contents
 
@@ -132,6 +196,7 @@ Will call all subscribe functions of changed path.
 -   `value` **Any** The new value. If you provide a function, it will be given the current value at path and should return a new value. (see examples).
 -   `options` **Object** (optional) Some additional options.
     -   `noPublish` **Boolean** (optional) Do not trigger subscriber functions. The subscribe functions that would have been called will instead be called the next time `store.set` is called without the `noPublish` option
+    -   `identifier` **String** (optional) A custom identifier that will be shown in Redux Devtools. Normally in Redux-land this would be the action. In Pathstore this is normally the path.
 
 #### Examples
 
@@ -215,6 +280,7 @@ Hook that returns a stateful value, and a function to update it.
 -   `options`  **Object** (optional) Some additional options.
     -   `cleanup`  **Boolean**  (optional, default `false`) Set the value at `path` in state to `undefined` when the component unmounts.
     -   `override`  **Boolean**  (optional, default `false`) Set the value at `path` to `initialValue` even if there is already a value there.
+    -   `identifier`  **String**  (optional) An identifier to use in Redux Devtools.
 
 #### Return
 
