@@ -2,7 +2,14 @@
 
 A simple, performant global store that works well with React.
 
-✨ Also works with redux devtools ✨
+✨ Also works with Redux Devtools ✨
+
+## Why does this exist?
+
+Wanted a global store that is:
+- [performant / can scale](#performance)
+- tiny
+- succinct
 
 ## Table of Contents
 
