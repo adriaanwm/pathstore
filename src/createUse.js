@@ -2,15 +2,20 @@ import {equals} from 'ramda'
 
 export const createUse = ({store, useEffect, useState}) =>
   (path, defaultValue, options = {}) => {
-    const existing = store.get(path)
+    const storeValue = store.get(path)
     const [value, setValue] = useState(
-      (options.override || existing === undefined)
+      (options.override || storeValue === undefined)
         ? defaultValue
-        : existing
+        : storeValue
     )
     useEffect(() => {
-      const existing = store.get(path)
-      if (options.override || existing === undefined) {
+      const storeValue = store.get(path)
+      setValue(
+        (options.override || storeValue === undefined)
+          ? defaultValue
+          : storeValue
+      )
+      if (options.override || storeValue === undefined) {
         store.set(path, defaultValue, {identifier: options.identifier})
       }
       const unsub = store.subscribe(path, () => {
