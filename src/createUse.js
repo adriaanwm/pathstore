@@ -1,6 +1,6 @@
 import {equals} from 'ramda'
 
-export const createUse = ({store, useEffect, useState}) =>
+export const createUse = ({store, useEffect, useState, useRef}) =>
   (path, defaultValue, options = {}) => {
     const storeValue = store.get(path)
     const [value, setValue] = useState(
@@ -8,6 +8,7 @@ export const createUse = ({store, useEffect, useState}) =>
         ? defaultValue
         : storeValue
     )
+    const valueRef = useRef(value)
     useEffect(() => {
       const storeValue = store.get(path)
       setValue(
@@ -20,7 +21,8 @@ export const createUse = ({store, useEffect, useState}) =>
       }
       const unsub = store.subscribe(path, () => {
         const newValue = store.get(path)
-        if (!equals(newValue, value)) {
+        if (!equals(newValue, valueRef.current)) {
+          valueRef.current = newValue
           setValue(newValue)
         }
       })

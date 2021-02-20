@@ -25,11 +25,12 @@ const subscribersOfPath = (path, subscribers) => [
   ...allSubscribers(pathOr({}, path, subscribers))
 ]
 
-export const createStore = ({useEffect, useState, reduxDevtools}) => {
+export const createStore = ({useEffect, useState, useRef, reduxDevtools}) => {
   let state = {}
   let subscribers = {}
   let changes = []
   const store = {
+    subscribers: () => subscribers,
     get: path => rPath(path, state),
     set: (path, value, options = {}) => {
       value = typeof value === 'function' ? value(existing) : value
@@ -68,6 +69,6 @@ export const createStore = ({useEffect, useState, reduxDevtools}) => {
       }
     }
   }
-  store.use = createUse({store, useEffect, useState})
+  store.use = createUse({store, useEffect, useState, useRef})
   return reduxDevtools ? setupReduxDevtools(store) : store
 }

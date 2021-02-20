@@ -72,9 +72,9 @@ create a store
 
 ```js
 import {createStore} from '@adriaanwm/pathstore'
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef} from 'react'
 
-export const store = createStore({ useEffect, useState, reduxDevtools: true })
+export const store = createStore({ useEffect, useState, useRef, reduxDevtools: true })
 ```
 
 use the store
@@ -187,6 +187,7 @@ Creates a new store.
 -   `init` **Object** The initialization object.
     -   `useState` **Function** The useState function from react or preact.
     -   `useEffect` **Function** The useEffect function from react or preact.
+    -   `useRef` **Function** The useRef function from react or preact.
     -   `reduxDevtools` **Boolean** Whether to turn on redux devtools.
 
 #### Returns
@@ -196,8 +197,8 @@ Creates a new store.
 #### Examples
 
 ```javascript
-import { useState, useEffect } from 'react'
-let store = createStore({useState, useEffect, reduxDevtools: true})
+import { useState, useEffect, useRef } from 'react'
+let store = createStore({useState, useEffect, useRef, reduxDevtools: true})
 store.subscribe([], state => console.log(state) );
 store.set(['a'], 'b')   // logs { a: 'b' }
 store.set(['c'], 'd')   // logs { a: 'b', c: 'd' }
