@@ -11,11 +11,11 @@ export const createUse = ({store, useEffect, useState, useRef}) =>
     const valueRef = useRef(value)
     useEffect(() => {
       const storeValue = store.get(path)
-      setValue(
-        (options.override || (storeValue === undefined && defaultValue !== undefined))
-          ? defaultValue
-          : storeValue
-      )
+      const initialValue = (options.override || (storeValue === undefined && defaultValue !== undefined))
+        ? defaultValue
+        : storeValue
+      valueRef.current = initialValue
+      setValue(initialValue)
       if (options.override || (storeValue === undefined && defaultValue !== undefined)) {
         store.set(path, defaultValue, {identifier: options.identifier})
       }
