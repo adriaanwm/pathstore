@@ -4,7 +4,7 @@ export const createUse = ({store, useEffect, useState, useRef}) =>
   (path, defaultValue, options = {}) => {
     const storeValue = store.get(path)
     const [value, setValue] = useState(
-      (options.override || storeValue === undefined)
+      (options.override || (storeValue === undefined && defaultValue !== undefined))
         ? defaultValue
         : storeValue
     )
@@ -12,11 +12,11 @@ export const createUse = ({store, useEffect, useState, useRef}) =>
     useEffect(() => {
       const storeValue = store.get(path)
       setValue(
-        (options.override || storeValue === undefined)
+        (options.override || (storeValue === undefined && defaultValue !== undefined))
           ? defaultValue
           : storeValue
       )
-      if (options.override || storeValue === undefined) {
+      if (options.override || (storeValue === undefined && defaultValue !== undefined)) {
         store.set(path, defaultValue, {identifier: options.identifier})
       }
       const unsub = store.subscribe(path, () => {
