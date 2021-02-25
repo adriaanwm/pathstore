@@ -41,3 +41,40 @@ export const createUse = ({store, useEffect, useState, useRef}) =>
         })
     ]
   }
+
+export const createUse2 = ({store, useEffect, useState, useRef}) =>
+  (path, defaultValue, options = {}) => {
+    const [value, setValue] = useState(() => {
+      const current = store.get(path)
+      return options.override ? defaultValue : current !== undefined ? current : defaultValue
+    })
+
+    useRunOnChange(() => {
+      const initial = options.override
+        ? defaultValue : current !== undefined ? current : defaultValue
+      const current = store.get(path)
+      if (equals(initial, current)) {
+        store.set(path, initial)
+        setValue(initial)
+      }
+      const unsubscribe = store.subscribe(() => {
+        const current = store.get(path)
+        if (!equals(current, value)) {
+          setValue(value)
+        }
+      })
+      return () => unsubscribe()
+    }, [path.join(',')])
+
+    // useRunOnce(() => {
+    //   const initial = options.override
+    //     ? defaultValue : current !== undefined ? current : defaultValue
+    //   const current = store.get(path)
+    //   if (equals(initial, current)) {
+    //     store.set(path, initial)
+    //   }
+    // })
+    // useEffect(() => {
+
+    // }, [path])
+  }
