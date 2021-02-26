@@ -1,15 +1,28 @@
 import {equals} from 'ramda'
 
-export const createUse = ({store, useEffect, useState, useRef}) =>
-  (path, defaultValue, options = {}) => {
-    const storeValue = store.get(path)
+export const createUseRunOnceOnChange = useRef => (fn, dependencies) => {
+  const lastRef = useRef({})
+  if (equals(lastRef.current.dependencies, dependencies)) return
+  if (lastRef.current.cleanup) lastRef.current.cleanup()
+  lastRef.current = {
+    dependencies,
+    cleanup: fn()
+  }
+}
+
+export const createUse = ({store, useState, useRef}) => {
+  const useRunOnceOnChange = createUseRunOnceOnChange(useRef)
+  return (path, defaultValue, options = {}) => {
     const [value, setValue] = useState(
-      (options.override || (storeValue === undefined && defaultValue !== undefined))
-        ? defaultValue
-        : storeValue
+      () => {
+        const storeValue = store.get(path)
+        return (options.override || (storeValue === undefined && defaultValue !== undefined))
+          ? defaultValue
+          : storeValue
+      }
     )
     const valueRef = useRef(value)
-    useEffect(() => {
+    useRunOnceOnChange(() => {
       const storeValue = store.get(path)
       const initialValue = (options.override || (storeValue === undefined && defaultValue !== undefined))
         ? defaultValue
@@ -32,7 +45,7 @@ export const createUse = ({store, useEffect, useState, useRef}) =>
         }
         unsub()
       }
-    }, [JSON.stringify(path)])
+    }, path)
     return [
       value,
       (newValue, options2 = {}) =>
@@ -41,3 +54,4 @@ export const createUse = ({store, useEffect, useState, useRef}) =>
         })
     ]
   }
+}
