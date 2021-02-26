@@ -47,7 +47,7 @@ export const createUse = ({store, useState, useRef}) => {
       }
     }, path)
     return [
-      value,
+      valueRef.current,
       (newValue, options2 = {}) =>
         store.set(path, newValue, {
           identifier: options2.identifier || options.identifier
